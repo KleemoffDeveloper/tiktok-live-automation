@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: auto;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+header {
+    position: fixed;
+    margin: auto;
+    max-width: 768px;
+    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1em;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    backdrop-filter: blur(10px);
+}
+
+main {
+    padding-top: 2.5em;
+    max-width: 768px;
+    width: 100%;
+    margin: auto;
+    padding-bottom: 10em;
+}
+
+.gift {
+    max-width: 768px;
+    width: 100%;
+    padding: 1em;
+    background-color: whitesmoke;
+    display: flex;
+}
+
+.container {
+    display: grid;
+    place-items: center;
+    gap: 1em;
+    padding: 1em;
+    max-width: max-content;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    color: rgb(96, 96, 96);
+    font-size: smaller;
+}
+
+.icons-container {
+    display: grid;
+    grid-template-columns: max-content max-content max-content;
+    place-items: center;
+    gap: 1em;
+    padding: 1em;
+    max-width: max-content;
+    width: 100%;
+    margin: auto;
+}
+
+.pfp-container {
+    width: 64px;
+    height: 64px;
+    overflow: hidden;
+    border-radius: 100%;
+    display: flex;
+}
+
+.pfp-container img {
+    object-fit: contain;
+    object-position: center;
+}
+
+.icon-container {
+    width: 32px;
+    height: 32px;
+    display: flex;
+}
+
+.image {
+    object-fit: contain;
+    object-position: center;
+}
