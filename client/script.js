@@ -203,7 +203,7 @@ try {
 
     const totalUsdElement = document.getElementById("totalusd");
 
-    totalUsdElement.textContent = `$${totalUsd.toFixed(2)} / $250`;
+    totalUsdElement.textContent = `Face Reveal Tier 1 ... $${totalUsd.toFixed(2)} / $250`;
 } catch (error) {
     console.error(
         "Failed to load stored gifts:",
@@ -294,7 +294,7 @@ stream.onmessage = (event) => {
 
         // Add newest gift.
         gifts.unshift(gift);
-        
+
         // Update total USD earned.
         const currentTotalUsd =
             parseFloat(localStorage.getItem("totalUsd")) || 0;
@@ -320,8 +320,10 @@ stream.onmessage = (event) => {
 
         const totalUsd =
             parseFloat(localStorage.getItem("totalUsd")) || 0;
+
         const totalUsdElement = document.getElementById("totalusd");
-        totalUsdElement.textContent = `$${totalUsd.toFixed(2)}`;
+
+        totalUsdElement.textContent = `Face Reveal Tier 1 ... $${totalUsd.toFixed(2)} / $250`;
 
     } catch (error) {
         console.error(
