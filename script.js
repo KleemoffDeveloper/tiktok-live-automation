@@ -1,6 +1,6 @@
 import { TikTokLiveConnection, WebcastEvent } from 'tiktok-live-connector';
 
-const username = 'pressurewashingstories';
+const username = 'motivatedbysuccess';
 
 export const connection = new TikTokLiveConnection(username, {});
 
