@@ -1,4 +1,169 @@
 const videoPlayer = document.getElementById("videoplayer");
+const main = document.getElementsByClassName("feed")[0];
+
+const STORAGE_KEY = "tiktok_gifts";
+const MAX_GIFTS = 10;
+const GIFT_MAX_AGE = 5 * 60 * 1000; // 5 minutes
+const DUPLICATE_WINDOW = 5000;
+
+// giftId -> timestamp
+const recentGiftIds = new Map();
+
+/**
+ * Format a timestamp as a relative time.
+ *
+ * Examples:
+ * 1 second ago
+ * 30 seconds ago
+ * 1 min ago
+ * 4 mins ago
+ * 1 hour ago
+ */
+function formatRelativeTime(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+    if (seconds < 1) {
+        return "just now";
+    }
+
+    if (seconds === 1) {
+        return "1 second ago";
+    }
+
+    if (seconds < 60) {
+        return `${seconds} seconds ago`;
+    }
+
+    const minutes = Math.floor(seconds / 60);
+
+    if (minutes === 1) {
+        return "1 min ago";
+    }
+
+    if (minutes < 60) {
+        return `${minutes} mins ago`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+
+    if (hours === 1) {
+        return "1 hour ago";
+    }
+
+    return `${hours} hours ago`;
+}
+
+/**
+ * Create a DOM element for a gift.
+ */
+function createGift(gift) {
+    console.log("Creating gift...");
+
+    const giftElement = document.createElement("div");
+    giftElement.className = "gift-list-item";
+    giftElement.dataset.giftId = gift.giftId;
+
+    const giftIconContainer = document.createElement("div");
+    giftIconContainer.className = "gift-icon-container";
+
+    const giftIcon = document.createElement("img");
+    giftIcon.src = gift.giftImageUrl;
+    giftIcon.alt = gift.giftName;
+
+    const pointsElement = document.createElement("h4");
+    pointsElement.textContent = `+${gift.POINTS} pts`;
+
+    const textInfo = document.createElement("div");
+    textInfo.className = "gift-text-info";
+
+    const text = document.createElement("h2");
+    text.textContent = gift.message;
+
+    textInfo.append(text);
+
+    console.log(gift);
+
+    giftIconContainer.append(giftIcon);
+
+    giftElement.append(
+        giftIconContainer,
+        textInfo
+    );
+
+    return giftElement;
+}
+
+/**
+ * Remove gifts older than 5 minutes.
+ */
+function removeExpiredGifts() {
+    const cutoff = Date.now() - GIFT_MAX_AGE;
+
+    const originalLength = gifts.length;
+
+    gifts = gifts.filter(gift => {
+        return gift.createdAt > cutoff;
+    });
+
+    if (gifts.length !== originalLength) {
+        saveGifts();
+        renderGifts();
+    }
+}
+
+/**
+ * Keep only the newest 10 gifts.
+ */
+function trimGifts() {
+    if (gifts.length > MAX_GIFTS) {
+        gifts = gifts.slice(0, MAX_GIFTS);
+    }
+}
+
+/**
+ * Save gifts to localStorage.
+ */
+function saveGifts() {
+    trimGifts();
+
+    // 1 Diamond = $0.005
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(gifts)
+    );
+}
+
+/**
+ * Render all gifts.
+ */
+function renderGifts() {
+    main.replaceChildren();
+
+    for (const gift of gifts) {
+        main.append(createGift(gift));
+    }
+}
+
+/**
+ * Update timestamps without rebuilding the gifts.
+ */
+function updateTimestamps() {
+    const timestamps = document.querySelectorAll(
+        ".gift-timestamp"
+    );
+
+    for (const element of timestamps) {
+        const createdAt = Number(element.dataset.createdAt);
+
+        element.textContent = formatRelativeTime(createdAt);
+    }
+}
+
+/**
+ * Load stored gifts.
+ */
+let gifts = [];
 
 const playVideo = (src = "") => {
     videoPlayer.src = src;
@@ -275,7 +440,7 @@ const soundboard = {
 
 const stream = new EventSource("http://localhost:3000/gift");
 
-stream.onmessage = (event) => {
+stream.onmessage = async (event) => {
     try {
         const data = JSON.parse(event.data);
 
@@ -285,97 +450,102 @@ stream.onmessage = (event) => {
 
         playVideo(soundboard[sound]);
 
-        // const giftId = data.giftId;
-        // const message = data.common?.describe;
+        const giftId = data.giftId;
+        const message = data.common?.describe;
 
         // // USER PFP
-        // const imageUrl =
-        //     data.user?.avatarThumb?.urlList?.[0] ||
-        //     "https://placehold.co/64x64";
+        const imageUrl =
+            data.user?.avatarThumb?.urlList?.[0] ||
+            "https://placehold.co/64x64";
 
         // // GIFT ICON
-        // const giftImageUrl = data.gift?.image?.urlList[0] ||
-        //     "https://placehold.co/32x32";
+        const giftImageUrl = data.gift?.image?.urlList[0] ||
+            "https://placehold.co/32x32";
+
+        // const response = await fetch(giftImageUrl);
+        // const buffer = Buffer.from(await response.arrayBuffer());
+
+        // const base64 = buffer.toString("base64");
 
         // // TIKTOK DIAMONDS
-        // const POINTS = data.gift?.diamondCount || 0;
+        const POINTS = data.gift?.diamondCount || 0;
 
         // // CREATOR USD VALUE
-        // const usdAmount = Number((POINTS * 0.005).toFixed(2));
+        const usdAmount = Number((POINTS * 0.005).toFixed(2));
 
-        // const giftName =
-        //     data?.gift?.describe ||
-        //     "Gift";
+        const giftName =
+            data?.gift?.describe ||
+            "Gift";
 
-        // if (!giftId || !message) {
-        //     return;
-        // }
+        if (!giftId || !message) {
+            return;
+        }
 
-        // const now = Date.now();
+        const now = Date.now();
 
-        // const previousTime =
-        //     recentGiftIds.get(giftId);
+        const previousTime =
+            recentGiftIds.get(giftId);
 
-        // // Ignore duplicate event within 5 seconds.
-        // if (
-        //     previousTime &&
-        //     now - previousTime < DUPLICATE_WINDOW
-        // ) {
-        //     console.log(
-        //         "Duplicate gift ignored:",
-        //         giftId
-        //     );
+        // Ignore duplicate event within 5 seconds.
+        if (
+            previousTime &&
+            now - previousTime < DUPLICATE_WINDOW
+        ) {
+            console.log(
+                "Duplicate gift ignored:",
+                giftId
+            );
 
-        //     return;
-        // }
+            return;
+        }
 
-        // recentGiftIds.set(giftId, now);
+        recentGiftIds.set(giftId, now);
 
-        // const gift = {
-        //     giftId,
-        //     message,
-        //     giftName,
-        //     imageUrl,
-        //     giftImageUrl,
-        //     POINTS,
-        //     usdAmount,
-        //     createdAt: now
-        // };
+        const gift = {
+            giftId,
+            message,
+            giftName,
+            imageUrl,
+            giftImageUrl,
+            POINTS,
+            usdAmount,
+            createdAt: now
+        };
 
-        // console.log("Gift received:", gift);
+        console.log("Gift received:", gift);
 
-        // // Add newest gift.
-        // gifts.unshift(gift);
+        // Add newest gift.
+        gifts.unshift(gift);
 
-        // // Update total USD earned.
-        // const currentTotalUsd =
-        //     parseFloat(localStorage.getItem("totalUsd")) || 0;
+        // Update total USD earned.
+        const currentTotalUsd =
+            parseFloat(localStorage.getItem("totalUsd")) || 0;
 
-        // const newTotalUsd =
-        //     Number((currentTotalUsd + usdAmount).toFixed(2));
+        const newTotalUsd =
+            Number((currentTotalUsd + usdAmount).toFixed(2));
 
-        // localStorage.setItem(
-        //     "totalUsd",
-        //     newTotalUsd.toString()
-        // );
+        localStorage.setItem(
+            "totalUsd",
+            newTotalUsd.toString()
+        );
 
-        // // Remove anything older than 5 minutes.
-        // gifts = gifts.filter(gift => {
-        //     return now - gift.createdAt < GIFT_MAX_AGE;
-        // });
+        // Remove anything older than 5 minutes.
+        gifts = gifts.filter(gift => {
+            return now - gift.createdAt < GIFT_MAX_AGE;
+        });
 
-        // // Keep only the newest 10.
-        // trimGifts();
+        // Keep only the newest 10.
+        trimGifts();
 
-        // saveGifts();
-        // renderGifts();
+        saveGifts();
+        renderGifts();
 
-        // const totalUsd =
-        //     parseFloat(localStorage.getItem("totalUsd")) || 0;
+        const totalUsd =
+            parseFloat(localStorage.getItem("totalUsd")) || 0;
 
-        // const totalUsdElement = document.getElementById("totalusd");
+        const totalUsdElement = document.getElementById("totalusd");
 
-        // totalUsdElement.textContent = `Face Reveal Tier 1 ... $${totalUsd.toFixed(2)} / $250`;
+        totalUsdElement.textContent = `Face Reveal Tier 1 ... $${totalUsd.toFixed(2)} / $250`;
 
     } catch (error) {
         console.error(
@@ -395,4 +565,4 @@ stream.onerror = (error) => {
     // status.style.color = "#f87171";
 };
 
-// playVideo("videos/chika.mp4");
+playVideo("videos/fart.mp4");

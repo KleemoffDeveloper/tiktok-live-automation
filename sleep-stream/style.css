@@ -1,4 +1,5 @@
 * {
+    box-sizing: border-box;
     padding: 0;
     margin: 0;
     overscroll-behavior: none;
@@ -7,18 +8,18 @@
 
 main {
     display: grid;
-    grid-template-columns: 540px 1fr;
+    grid-template-rows: 25vh 75vh;
+    max-width: 768px;
+    margin: auto;
 }
 
 .feed {
     height: 100vh;
-    background-color: whitesmoke;
 }
 
 .video-container {
-    height: 100vh;
+    height: 75vh;
     width: 100%;
-    background-color: gray;
     position: relative;
     overflow: hidden;
 }
@@ -29,4 +30,27 @@ main {
     object-fit: cover;
     object-position: center;
     display: block;
+}
+
+.gift-list-item {
+    padding: 1em;
+    display: grid;
+    grid-template-columns: 128px 1fr;
+}
+
+.gift-icon-container {
+    width: 128px;
+    height: 128px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+
+.gift-icon-container img {
+    object-fit: contain;
+    object-position: center;
+}
+
+.gift-text-info {
+    padding: 1em
 }

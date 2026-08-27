@@ -1,4 +1,4 @@
-const main = document.querySelector("main");
+const main = document.querySelector("feed");
 const status = document.getElementById("status");
 
 const stream = new EventSource("http://localhost:3000/gift");
@@ -62,18 +62,11 @@ function createGift(gift) {
     console.log("Creating gift...");
 
     const giftElement = document.createElement("div");
-    giftElement.className = "container";
+    giftElement.className = "gift-list-item";
     giftElement.dataset.giftId = gift.giftId;
 
-    const pfpContainer = document.createElement("div");
-    pfpContainer.className = "pfp-container";
-
-    const pfp = document.createElement("img");
-    pfp.src = gift.imageUrl;
-    pfp.alt = gift.giftName;
-
     const giftIconContainer = document.createElement("div");
-    giftIconContainer.className = "icon-container";
+    giftIconContainer.className = "gift-icon-container";
 
     const giftIcon = document.createElement("img");
     giftIcon.src = gift.giftImageUrl;
@@ -84,34 +77,15 @@ function createGift(gift) {
 
     console.log(gift);
 
-    pfpContainer.append(pfp);
     giftIconContainer.append(giftIcon);
 
     const iconsContainer = document.createElement("div");
     iconsContainer.className = "icons-container";
 
-    iconsContainer.append(pfpContainer, pointsElement, giftIconContainer);
-
-    const messageContainer = document.createElement("div");
-    messageContainer.className = "message-container";
-
-    const message = document.createElement("p");
-    message.className = "gift-message";
-    message.textContent = gift.message || "";
-
-    const timestamp = document.createElement("small");
-    timestamp.className = "gift-timestamp";
-    timestamp.dataset.createdAt = gift.createdAt;
-    timestamp.textContent = formatRelativeTime(gift.createdAt);
-
-    messageContainer.append(
-        message,
-        timestamp
-    );
+    iconsContainer.append(giftIconContainer);
 
     giftElement.append(
-        iconsContainer,
-        messageContainer
+        iconsContainer
     );
 
     return giftElement;
