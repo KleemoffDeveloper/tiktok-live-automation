@@ -13,6 +13,7 @@ app.get("/gift", (req, res) => {
     res.setHeader("Connection", "keep-alive");
 
     const giftListener = (data) => {
+        console.log(data);
         res.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
