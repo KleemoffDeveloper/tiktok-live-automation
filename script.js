@@ -2,7 +2,9 @@ import { TikTokLiveConnection, WebcastEvent } from 'tiktok-live-connector';
 
 // const username = 'itsdeaann';
 // const username = 'pinkydollreal';
-const username = 'sapoguapo316';
+// const username = 'sapoguapo316';
+// const username = 'drakostl314';
+const username = 'toxicity.c';
 
 export const connection = new TikTokLiveConnection(username, {});
 

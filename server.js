@@ -12,6 +12,10 @@ app.get("/gift", (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
+    res.write(`data: ${JSON.stringify({
+        type: "connected"
+    })}\n\n`);
+
     const giftListener = (data) => {
         console.log(data);
         res.write(`data: ${JSON.stringify(data)}\n\n`);
