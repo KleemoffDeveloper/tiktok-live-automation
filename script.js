@@ -1,30 +1,36 @@
-import { TikTokLiveConnection, WebcastEvent } from 'tiktok-live-connector';
+import { TikTokLiveConnection } from 'tiktok-live-connector';
 
 // const username = 'itsdeaann';
 // const username = 'pinkydollreal';
 // const username = 'sapoguapo316';
 // const username = 'drakostl314';
-const username = 'toxicity.c';
+// const username = 'toxicity.c';
+// const username = 'melhardk1';
+// const username = 'lookitsvicky';
+// const username = 'loganmicke';
+// const username = 'mariahandbill';
 
-export const connection = new TikTokLiveConnection(username, {});
+const connections = new Map();
 
-connection.connect()
-    .then(state => {
-        console.log(`Connected to room ${state.roomId}`);
-    })
-    .catch(error => {
-        console.error('Failed to connect:', error);
-    });
+export function getConnection(username) {
+    if (!connections.has(username)) {
+        const connection = new TikTokLiveConnection(username, {});
 
-// connection.on('chat', data => {
-//     // console.log(data);
-//     // console.log(data.displayId);
-//     // console.log(data.content);
-//     // console.log(data.avatarThumb?.urlList);
-// });
-// connection.on('gift', data => {
-//     console.log(data);
-//     // console.log(data.displayId);
-//     // console.log(data.content);
-//     // console.log(data.avatarThumb?.urlList);
-// });
+        connection.connect()
+            .then(state => {
+                console.log(
+                    `Connected to @${username} - room ${state.roomId}`
+                );
+            })
+            .catch(error => {
+                console.error(
+                    `Failed to connect to @${username}:`,
+                    error
+                );
+            });
+
+        connections.set(username, connection);
+    }
+
+    return connections.get(username);
+}
